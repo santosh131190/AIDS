@@ -1,133 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI & DS Department Portal</title>
+
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to right, #e0f7fa, #e1bee7);
+    text-align: center;
+  }
+
+  h1 {
+    margin-top: 30px;
+    color: #4a148c;
+  }
+
+  .container {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+  }
+
+  .card {
+    background: white;
+    padding: 25px;
+    width: 300px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  }
+
+  .card h2 {
+    margin-bottom: 20px;
+    color: #006064;
+  }
+
+  input {
+    width: 90%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+
+  button {
+    width: 95%;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    background: #00838f;
+    color: white;
+    font-size: 15px;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background: #006064;
+  }
+
+  .msg {
+    margin-top: 10px;
+    font-size: 14px;
+  }
+
+  #attendance-section {
+    display: none;
+    margin-top: 40px;
+  }
+
+  table {
+    margin: auto;
+    border-collapse: collapse;
+    width: 90%;
+    background: white;
+  }
+
+  th, td {
+    border: 1px solid #ccc;
+    padding: 8px;
+  }
+
+  th {
+    background: #00838f;
+    color: white;
+  }
+
+  .top-links {
+    margin-top: 20px;
+  }
+
+  .top-links a {
+    margin: 0 15px;
+    text-decoration: none;
+    font-weight: bold;
+    color: #4a148c;
+  }
+
+</style>
+</head>
+
+<body>
+
+<h1>Department of Artificial Intelligence & Data Science</h1>
+
+<div class="top-links">
+  <a href="Timetable.html">📅 Timetable</a>
+  <a href="Notices.html">📢 Notices</a>
+</div>
+
+<div class="container">
+
+  <!-- Faculty Login -->
+  <div class="card">
+    <h2>Faculty Login</h2>
+    <form id="faculty-form">
+      <input id="faculty-username" placeholder="Username" required>
+      <input id="faculty-password" type="password" placeholder="Password" required>
+      <button type="submit">Login</button>
+      <div id="faculty-message" class="msg"></div>
+    </form>
+  </div>
+
+  <!-- Student Login -->
+  <div class="card">
+    <h2>Student Login</h2>
+    <form id="student-form">
+      <input id="student-username" placeholder="Roll No" required>
+      <input id="student-password" type="password" placeholder="Password" required>
+      <button type="submit">Login</button>
+      <div id="student-message" class="msg"></div>
+    </form>
+  </div>
+
+</div>
+
+<!-- Attendance Section -->
+<div id="attendance-section">
+  <h2>Student Attendance</h2>
+  <table id="attendance-table"></table>
+  <br>
+  <button onclick="goBack()">⬅ Back</button>
+</div>
+
 <script>
 
-  // ===============================
-  // USER DATABASE
-  // ===============================
+// ================= USER DATABASE =================
 
-  const studentData = {
-    "s101": { password: "stud101" },
-    "s102": { password: "stud102" }
-  };
+const studentData = {
+  "s101": { password: "stud101" },
+  "s102": { password: "stud102" }
+};
 
-  const facultyData = {
-    "sss": { password: "123" }
-  };
+const facultyData = {
+  "sss": { password: "123" }
+};
 
-  // ===============================
-  // LOGIN FUNCTION
-  // ===============================
+// ================= LOGIN FUNCTION =================
 
-  function attachLogin(formId, userId, passId, msgId, db, role) {
-    document.getElementById(formId).addEventListener("submit", e => {
-      e.preventDefault();
+function attachLogin(formId, userId, passId, msgId, db, role) {
+  document.getElementById(formId).addEventListener("submit", e => {
+    e.preventDefault();
 
-      const u = document.getElementById(userId).value.trim().toLowerCase();
-      const p = document.getElementById(passId).value;
-      const msg = document.getElementById(msgId);
+    const u = document.getElementById(userId).value.trim().toLowerCase();
+    const p = document.getElementById(passId).value;
+    const msg = document.getElementById(msgId);
 
-      if (db[u] && db[u].password === p) {
+    if (db[u] && db[u].password === p) {
+      msg.style.color = "green";
+      msg.textContent = "Login Successful";
 
-        msg.style.color = "green";
-        msg.textContent = "Login Successful... Loading";
-
-        if (role === "student") {
-          loadAttendance(u);
-        }
-
-      } else {
-        msg.style.color = "red";
-        msg.textContent = "Invalid username or password";
+      if (role === "student") {
+        loadAttendance(u);
       }
+
+    } else {
+      msg.style.color = "red";
+      msg.textContent = "Invalid username or password";
+    }
+  });
+}
+
+attachLogin("faculty-form", "faculty-username", "faculty-password", "faculty-message", facultyData, "faculty");
+attachLogin("student-form", "student-username", "student-password", "student-message", studentData, "student");
+
+// ================= LOAD ATTENDANCE =================
+
+function loadAttendance(username) {
+
+  document.querySelector(".container").style.display = "none";
+  document.getElementById("attendance-section").style.display = "block";
+
+  const sampleData = [
+    ["Roll No", "Subject1", "Subject2", "Subject3"],
+    ["s101", "85%", "90%", "88%"],
+    ["s102", "78%", "80%", "75%"]
+  ];
+
+  const table = document.getElementById("attendance-table");
+  table.innerHTML = "";
+
+  sampleData.forEach((row, index) => {
+    let tr = "<tr>";
+    row.forEach(cell => {
+      if(index === 0)
+        tr += `<th>${cell}</th>`;
+      else if(row[0] === username)
+        tr += `<td>${cell}</td>`;
     });
-  }
+    tr += "</tr>";
 
-  attachLogin("faculty-form", "faculty-username", "faculty-password", "faculty-message", facultyData, "faculty");
-  attachLogin("student-form", "student-username", "student-password", "student-message", studentData, "student");
+    if(index === 0 || row[0] === username)
+      table.innerHTML += tr;
+  });
 
+}
 
-  // ===============================
-  // LOAD ATTENDANCE FUNCTION
-  // ===============================
+// ================= BACK BUTTON =================
 
-  function loadAttendance(username) {
-
-    // Hide login section
-    document.querySelector(".main-section").style.display = "none";
-
-    // Show attendance section
-    document.getElementById("attendance-section").style.display = "block";
-
-    // 🔴 IMPORTANT:
-    // Replace below URL with your Google Apps Script Web App URL
-    const apiURL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL";
-
-    fetch(apiURL)
-      .then(response => response.json())
-      .then(data => {
-
-        const table = document.getElementById("attendance-table");
-        table.innerHTML = "";
-
-        data.forEach((row, index) => {
-
-          if (index === 0) {
-            // Header Row
-            let headerRow = "<tr>";
-            row.forEach(cell => {
-              headerRow += `<th style="background:#00838f; color:white;">${cell}</th>`;
-            });
-            headerRow += "</tr>";
-            table.innerHTML += headerRow;
-          }
-
-          else if (row[0].toLowerCase() === username) {
-            // Student Row
-            let studentRow = "<tr>";
-            row.forEach(cell => {
-              studentRow += `<td>${cell}</td>`;
-            });
-            studentRow += "</tr>";
-            table.innerHTML += studentRow;
-          }
-
-        });
-
-      })
-      .catch(error => {
-        alert("Error loading attendance data");
-        console.error(error);
-      });
-  }
-
-
-  // ===============================
-  // BACK BUTTON
-  // ===============================
-
-  function goBack() {
-    document.getElementById("attendance-section").style.display = "none";
-    document.querySelector(".main-section").style.display = "flex";
-  }
-
-
-  // ===============================
-  // DATE & TIME
-  // ===============================
-
-  function tic() {
-    document.getElementById("datetime").textContent =
-      new Date().toLocaleString("en-IN", {
-        weekday: "short",
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit"
-      });
-  }
-
-  tic();
-  setInterval(tic, 1000);
+function goBack() {
+  document.getElementById("attendance-section").style.display = "none";
+  document.querySelector(".container").style.display = "flex";
+}
 
 </script>
+
+</body>
+</html>
