@@ -1,232 +1,334 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI & DS Department Portal</title>
-
-<style>
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: linear-gradient(to right, #e0f7fa, #e1bee7);
-    text-align: center;
-  }
-
-  h1 {
-    margin-top: 30px;
-    color: #4a148c;
-  }
-
-  .container {
-    display: flex;
-    justify-content: center;
-    gap: 40px;
-    margin-top: 40px;
-    flex-wrap: wrap;
-  }
-
-  .card {
-    background: white;
-    padding: 25px;
-    width: 300px;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-  }
-
-  .card h2 {
-    margin-bottom: 20px;
-    color: #006064;
-  }
-
-  input {
-    width: 90%;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-  }
-
-  button {
-    width: 95%;
-    padding: 10px;
-    border: none;
-    border-radius: 6px;
-    background: #00838f;
-    color: white;
-    font-size: 15px;
-    cursor: pointer;
-  }
-
-  button:hover {
-    background: #006064;
-  }
-
-  .msg {
-    margin-top: 10px;
-    font-size: 14px;
-  }
-
-  #attendance-section {
-    display: none;
-    margin-top: 40px;
-  }
-
-  table {
-    margin: auto;
-    border-collapse: collapse;
-    width: 90%;
-    background: white;
-  }
-
-  th, td {
-    border: 1px solid #ccc;
-    padding: 8px;
-  }
-
-  th {
-    background: #00838f;
-    color: white;
-  }
-
-  .top-links {
-    margin-top: 20px;
-  }
-
-  .top-links a {
-    margin: 0 15px;
-    text-decoration: none;
-    font-weight: bold;
-    color: #4a148c;
-  }
-
-</style>
-</head>
-
-<body>
-
-<h1>Department of Artificial Intelligence & Data Science</h1>
-
-<div class="top-links">
-  <a href="Timetable.html">📅 Timetable</a>
-  <a href="Notices.html">📢 Notices</a>
-</div>
-
-<div class="container">
-
-  <!-- Faculty Login -->
-  <div class="card">
-    <h2>Faculty Login</h2>
-    <form id="faculty-form">
-      <input id="faculty-username" placeholder="Username" required>
-      <input id="faculty-password" type="password" placeholder="Password" required>
-      <button type="submit">Login</button>
-      <div id="faculty-message" class="msg"></div>
-    </form>
-  </div>
-
-  <!-- Student Login -->
-  <div class="card">
-    <h2>Student Login</h2>
-    <form id="student-form">
-      <input id="student-username" placeholder="Roll No" required>
-      <input id="student-password" type="password" placeholder="Password" required>
-      <button type="submit">Login</button>
-      <div id="student-message" class="msg"></div>
-    </form>
-  </div>
-
-</div>
-
-<!-- Attendance Section -->
-<div id="attendance-section">
-  <h2>Student Attendance</h2>
-  <table id="attendance-table"></table>
-  <br>
-  <button onclick="goBack()">⬅ Back</button>
-</div>
-
-<script>
-
-// ================= USER DATABASE =================
-
-const studentData = {
-  "s101": { password: "stud101" },
-  "s102": { password: "stud102" }
-};
-
-const facultyData = {
-  "sss": { password: "123" }
-};
-
-// ================= LOGIN FUNCTION =================
-
-function attachLogin(formId, userId, passId, msgId, db, role) {
-  document.getElementById(formId).addEventListener("submit", e => {
-    e.preventDefault();
-
-    const u = document.getElementById(userId).value.trim().toLowerCase();
-    const p = document.getElementById(passId).value;
-    const msg = document.getElementById(msgId);
-
-    if (db[u] && db[u].password === p) {
-      msg.style.color = "green";
-      msg.textContent = "Login Successful";
-
-      if (role === "student") {
-        loadAttendance(u);
-      }
-
-    } else {
-      msg.style.color = "red";
-      msg.textContent = "Invalid username or password";
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login – AI & DS Dept.</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: "Segoe UI", Roboto, sans-serif;
     }
-  });
-}
 
-attachLogin("faculty-form", "faculty-username", "faculty-password", "faculty-message", facultyData, "faculty");
-attachLogin("student-form", "student-username", "student-password", "student-message", studentData, "student");
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      position: relative;
+      padding: 1rem;
+    }
 
-// ================= LOAD ATTENDANCE =================
+    .background-img {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+      opacity: 0.4;
+    }
 
-function loadAttendance(username) {
+    .datetime-top {
+      position: fixed;
+      top: .75rem;
+      left: 1rem;
+      font: bold .95rem/1 "Segoe UI", Roboto, sans-serif;
+      color: #37474f;
+      background: rgba(255, 255, 255, .6);
+      padding: .3rem .8rem;
+      border-radius: .5rem;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, .1);
+      z-index: 10;
+    }
 
-  document.querySelector(".container").style.display = "none";
-  document.getElementById("attendance-section").style.display = "block";
+    .top-links {
+      position: fixed;
+      top: .75rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 1rem;
+      z-index: 10;
+    }
 
-  const sampleData = [
-    ["Roll No", "Subject1", "Subject2", "Subject3"],
-    ["s101", "85%", "90%", "88%"],
-    ["s102", "78%", "80%", "75%"]
-  ];
+    .top-links div {
+      background: rgba(255, 255, 255, .6);
+      padding: .3rem .8rem;
+      border-radius: .5rem;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, .1);
+      font-size: .9rem;
+    }
 
-  const table = document.getElementById("attendance-table");
-  table.innerHTML = "";
+    .top-links a {
+      color: #004d40;
+      text-decoration: none;
+      font-weight: 600;
+    }
 
-  sampleData.forEach((row, index) => {
-    let tr = "<tr>";
-    row.forEach(cell => {
-      if(index === 0)
-        tr += `<th>${cell}</th>`;
-      else if(row[0] === username)
-        tr += `<td>${cell}</td>`;
-    });
-    tr += "</tr>";
+    .top-links a:hover {
+      text-decoration: underline;
+    }
 
-    if(index === 0 || row[0] === username)
-      table.innerHTML += tr;
-  });
+    .header {
+      text-align: center;
+      color: #880e4f;
+      margin-top: 4rem;
+      margin-bottom: 1.5rem;
+    }
 
-}
+    .header h1 {
+      font-size: 2rem;
+      margin: 0;
+      background: linear-gradient(90deg, #880e4f, #4a148c);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    }
 
-// ================= BACK BUTTON =================
+    .header h2 {
+      font-size: 1.25rem;
+      margin: 0.25rem 0 0.75rem;
+      color: #006064;
+      font-weight: 600;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    }
 
-function goBack() {
-  document.getElementById("attendance-section").style.display = "none";
-  document.querySelector(".container").style.display = "flex";
-}
+    .main-section {
+      display: flex;
+      justify-content: space-between;
+      gap: 2rem;
+      width: 100%;
+      max-width: 1280px;
+      margin-top: 1rem;
+    }
 
-</script>
+    .side-section, .event-section {
+      width: 20%;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      align-items: center;
+    }
 
+    .cards {
+      display: flex;
+      flex-direction: row;
+      gap: 2rem;
+      justify-content: center;
+      flex-wrap: nowrap;
+      width: 60%;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, .08);
+      width: 100%;
+    }
+
+    .card h3 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      color: #004d40;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.25rem;
+      font-size: 0.9rem;
+      color: #374151;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 0.7rem 1rem;
+      margin-bottom: 1.1rem;
+      border: 1px solid #b0bec5;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.7rem 1rem;
+      border: none;
+      border-radius: 0.5rem;
+      background: #00838f;
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #006064;
+    }
+
+    .msg {
+      height: 1.25rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #d32f2f;
+      margin-top: 0.5rem;
+    }
+
+    .gallery {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      text-align: center;
+    }
+
+    .gallery img {
+      height: 150px;
+      width: 130px;
+      object-fit: cover;
+      border-radius: 0.5rem;
+      border: 2px solid #00695c;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .15);
+    }
+
+    .gallery span {
+      font-size: 0.85rem;
+      color: #004d40;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+
+    .event-section {
+      font-size: 0.9rem;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 0.5rem;
+      padding: 1rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, .1);
+    }
+
+    .event-section h4 {
+      color: #004d40;
+      margin-bottom: 0.5rem;
+    }
+
+    .event-section ul {
+      padding-left: 1.2rem;
+    }
+
+    .event-section li {
+      margin-bottom: 0.4rem;
+    }
+  </style>
+</head>
+<body>
+  <img src="https://i.postimg.cc/W1SW3DZq/Rajgad.webp" alt="Campus Background" class="background-img">
+  <div class="datetime-top" id="datetime"></div>
+  <div class="top-links">
+    <div><a href="<a href="https://github.com/santosh131190/AIDS.git">📅 Timetable</a></div>
+
+ 
+
+    <div><a href="https://santoshsshinde13.github.io/AIDS-/Notices.html" target="_blank">📢 Notices</a></div>
+  </div>
+
+  <div class="header">
+    <h1>Rajgad Technical Campus</h1>
+    <h2>Department of Artificial Intelligence and Data Science</h2>
+  </div>
+
+  <div class="main-section">
+    <div class="side-section gallery">
+      <div>
+        <img src="https://raw.githubusercontent.com/Santoshsshinde13/AIDS-/main/S%20G%20Shinde.jpg" alt="Dr. S. G. Shinde">
+        <span>Dr. S. G. Shinde</span>
+      </div>
+      <div>
+        <img src="https://raw.githubusercontent.com/Santoshsshinde13/AIDS-/main/Santosh%20White%20BG.png" alt="Prof. Santosh S. Shinde">
+        <span>Prof. Santosh S. Shinde</span>
+      </div>
+      <div>
+        <img src="https://raw.githubusercontent.com/Santoshsshinde13/AIDS-/main/Priyanka%20Kedge.jpg" alt="Prof. Priyanka Kedge">
+        <span>Prof. Priyanka Kedge</span>
+      </div>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <h3>Faculty Login</h3>
+        <form id="faculty-form">
+          <label for="faculty-username">Username</label>
+          <input id="faculty-username" type="text" required>
+          <label for="faculty-password">Password</label>
+          <input id="faculty-password" type="password" required>
+          <div class="forgot-link"><a href="#" onclick="alert('Please contact the department admin to reset your password.'); return false;">Forgot password?</a></div>
+          <button type="submit">Login</button>
+          <div id="faculty-message" class="msg"></div>
+        </form>
+      </div>
+
+      <div class="card">
+        <h3>Student Login</h3>
+        <form id="student-form">
+          <label for="student-username">Roll No / Username</label>
+          <input id="student-username" type="text" required>
+          <label for="student-password">Password</label>
+          <input id="student-password" type="password" required>
+          <div class="forgot-link"><a href="#" onclick="alert('Please contact your faculty advisor to reset your password.'); return false;">Forgot password?</a></div>
+          <button type="submit">Login</button>
+          <div id="student-message" class="msg"></div>
+        </form>
+      </div>
+    </div>
+
+    <div class="event-section">
+      <h4>📅 Upcoming Events</h4>
+      <ul>
+        <li>AI Workshop – 15th July</li>
+        <li>Data Science Hackathon – 22nd July</li>
+        <li>Guest Lecture: AI Ethics – 30th July</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    const facultyData = {
+      "sss": { password: "123", sheet: "https://docs.google.com/spreadsheets/d/1a-U9ov5tz8S6GmvBkXJrESdBPgWqWTBx/edit?gid=2027546080#gid=2027546080" }
+    };
+
+    const studentData = {
+      "s101": { password: "stud101", sheet: "https://docs.google.com/spreadsheets/d/yyyystu1" }
+    };
+
+    function attachLogin(formId, userId, passId, msgId, db) {
+      document.getElementById(formId).addEventListener("submit", e => {
+        e.preventDefault();
+        const u = document.getElementById(userId).value.trim().toLowerCase();
+        const p = document.getElementById(passId).value;
+        const msg = document.getElementById(msgId);
+        if (db[u] && db[u].password === p) {
+          msg.textContent = "Redirecting…";
+          window.location.replace(db[u].sheet);
+        } else {
+          msg.textContent = "Invalid username or password";
+        }
+      });
+    }
+    attachLogin("faculty-form", "faculty-username", "faculty-password", "faculty-message", facultyData);
+    attachLogin("student-form", "student-username", "student-password", "student-message", studentData);
+
+    function tic() {
+      document.getElementById("datetime").textContent =
+        new Date().toLocaleString("en-IN", {
+          weekday: "short", year: "numeric", month: "short", day: "numeric",
+          hour: "2-digit", minute: "2-digit", second: "2-digit"
+        });
+    }
+    tic(); setInterval(tic, 1000);
+  </script>
 </body>
+
 </html>
+
