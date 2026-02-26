@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI & DS Timetable</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(to right, #1e3c72, #2a5298);
+            color: white;
+            text-align: center;
+        }
+
+        header {
+            padding: 30px 10px;
+            background: rgba(0,0,0,0.2);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 32px;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin: 50px 20px;
+        }
+
+        .card {
+            background: white;
+            color: #333;
+            width: 250px;
+            padding: 40px 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            transition: 0.3s ease;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+        }
+
+        .card h2 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        footer {
+            margin-top: 80px;
+            padding: 20px;
+            background: rgba(0,0,0,0.3);
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>AI & DS Department – Timetable</h1>
+</header>
+
+<div class="container">
+    <div class="card">
+        <h2>📘 SE Timetable</h2>
+    </div>
+
+    <div class="card">
+        <h2>📗 TE Timetable</h2>
+    </div>
+
+    <div class="card">
+        <h2>📙 BE Timetable</h2>
+    </div>
+</div>
+
+<footer>
+    © 2025 Rajgad Technical Campus – AI & DS Department
+</footer>
+
+</body>
+</html>
