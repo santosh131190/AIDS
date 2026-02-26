@@ -1,0 +1,133 @@
+<script>
+
+  // ===============================
+  // USER DATABASE
+  // ===============================
+
+  const studentData = {
+    "s101": { password: "stud101" },
+    "s102": { password: "stud102" }
+  };
+
+  const facultyData = {
+    "sss": { password: "123" }
+  };
+
+  // ===============================
+  // LOGIN FUNCTION
+  // ===============================
+
+  function attachLogin(formId, userId, passId, msgId, db, role) {
+    document.getElementById(formId).addEventListener("submit", e => {
+      e.preventDefault();
+
+      const u = document.getElementById(userId).value.trim().toLowerCase();
+      const p = document.getElementById(passId).value;
+      const msg = document.getElementById(msgId);
+
+      if (db[u] && db[u].password === p) {
+
+        msg.style.color = "green";
+        msg.textContent = "Login Successful... Loading";
+
+        if (role === "student") {
+          loadAttendance(u);
+        }
+
+      } else {
+        msg.style.color = "red";
+        msg.textContent = "Invalid username or password";
+      }
+    });
+  }
+
+  attachLogin("faculty-form", "faculty-username", "faculty-password", "faculty-message", facultyData, "faculty");
+  attachLogin("student-form", "student-username", "student-password", "student-message", studentData, "student");
+
+
+  // ===============================
+  // LOAD ATTENDANCE FUNCTION
+  // ===============================
+
+  function loadAttendance(username) {
+
+    // Hide login section
+    document.querySelector(".main-section").style.display = "none";
+
+    // Show attendance section
+    document.getElementById("attendance-section").style.display = "block";
+
+    // 🔴 IMPORTANT:
+    // Replace below URL with your Google Apps Script Web App URL
+    const apiURL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL";
+
+    fetch(apiURL)
+      .then(response => response.json())
+      .then(data => {
+
+        const table = document.getElementById("attendance-table");
+        table.innerHTML = "";
+
+        data.forEach((row, index) => {
+
+          if (index === 0) {
+            // Header Row
+            let headerRow = "<tr>";
+            row.forEach(cell => {
+              headerRow += `<th style="background:#00838f; color:white;">${cell}</th>`;
+            });
+            headerRow += "</tr>";
+            table.innerHTML += headerRow;
+          }
+
+          else if (row[0].toLowerCase() === username) {
+            // Student Row
+            let studentRow = "<tr>";
+            row.forEach(cell => {
+              studentRow += `<td>${cell}</td>`;
+            });
+            studentRow += "</tr>";
+            table.innerHTML += studentRow;
+          }
+
+        });
+
+      })
+      .catch(error => {
+        alert("Error loading attendance data");
+        console.error(error);
+      });
+  }
+
+
+  // ===============================
+  // BACK BUTTON
+  // ===============================
+
+  function goBack() {
+    document.getElementById("attendance-section").style.display = "none";
+    document.querySelector(".main-section").style.display = "flex";
+  }
+
+
+  // ===============================
+  // DATE & TIME
+  // ===============================
+
+  function tic() {
+    document.getElementById("datetime").textContent =
+      new Date().toLocaleString("en-IN", {
+        weekday: "short",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+      });
+  }
+
+  tic();
+  setInterval(tic, 1000);
+
+</script>
